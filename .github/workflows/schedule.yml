@@ -2,8 +2,9 @@ name: Scheduled Twitter Bot
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 3:30 AM IST daily
-  workflow_dispatch:       # allows manual trigger
+    - cron: '*/5 * * * *'  # every 5 min (UTC)
+    - cron: '0 22 * * *'   # 3:30 AM IST daily
+  workflow_dispatch:
 
 jobs:
   tweet:
