@@ -3,32 +3,18 @@ import { TwitterApi } from 'twitter-api-v2';
 import 'dotenv/config';
 
 const postsPath = './posts.json';
-const postedPath = './posted.json';
+const posts = JSON.parse(fs.readFileSync(postsPath, 'utf-8'));
 
-// Load posts queue
-let posts = [];
-if (fs.existsSync(postsPath)) {
-  posts = JSON.parse(fs.readFileSync(postsPath, 'utf-8'));
-}
+// Find the next unposted tweet
+const nextPost = posts.find(p => !p.tweetedAt);
 
-if (!posts.length) {
-  console.log("✅ No posts left in posts.json. Exiting.");
+if (!nextPost) {
+  console.log("✅ No unposted tweets left.");
   process.exit(0);
 }
 
-// Take the first post
-const post = posts.shift();
+console.log(`📢 Posting: "${nextPost.text}"`);
 
-// Save updated posts
-fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2));
-
-// Ensure posted.json exists
-let posted = [];
-if (fs.existsSync(postedPath)) {
-  posted = JSON.parse(fs.readFileSync(postedPath, 'utf-8'));
-}
-
-// Post to Twitter
 const client = new TwitterApi({
   appKey: process.env.TWITTER_API_KEY,
   appSecret: process.env.TWITTER_API_SECRET,
@@ -36,23 +22,15 @@ const client = new TwitterApi({
   accessSecret: process.env.TWITTER_ACCESS_SECRET,
 });
 
-console.log(`📢 Posting: "${post.text}"`);
-
 try {
-  const response = await client.v2.tweet(post.text);
+  const response = await client.v2.tweet(nextPost.text);
   console.log("✅ Tweet posted with ID:", response.data.id);
 
-  // Add to posted.json with metadata
-  posted.push({
-    text: post.text,
-    tweetedAt: new Date().toISOString(),
-    tweetId: response.data.id
-  });
-  fs.writeFileSync(postedPath, JSON.stringify(posted, null, 2));
+  // Mark this post as tweeted
+  nextPost.tweetedAt = new Date().toISOString();
+  nextPost.tweetId = response.data.id;
+  fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2));
 
 } catch (err) {
   console.error("❌ Error posting tweet:", err);
-  // If failed, optionally push back into posts.json
-  posts.unshift(post);
-  fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2));
 }
