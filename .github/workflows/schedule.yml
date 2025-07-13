@@ -2,7 +2,7 @@ name: Scheduled Twitter Bot
 
 on:
   schedule:
-    - cron: '*/2 * * * *'  # every 2 min (UTC) for testing
+    - cron: '*/6 * * * *'  # every 2 min (UTC) for testing
   workflow_dispatch:
 
 jobs:
