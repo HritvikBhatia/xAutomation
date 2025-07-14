@@ -1,13 +1,16 @@
 name: Scheduled Twitter Bot
 
 on:
+  # PRODUCTION schedule - tweets 6 times a day (cron UTC -> IST in comments)
   schedule:
-    # For testing: This runs the job every 5 minutes.
-    # IMPORTANT: Change this back to your original schedule after testing!
-    - cron: '*/5 * * * *'
-  
-  # This allows you to manually trigger the workflow from the GitHub UI.
-  # This is the BEST way to test immediately.
+    - cron: '30 3 * * *'  # 9 AM IST
+    - cron: '30 5 * * *'  # 11 AM IST
+    - cron: '30 8 * * *'  # 2 PM IST
+    - cron: '30 11 * * *' # 5 PM IST
+    - cron: '30 13 * * *' # 7 PM IST
+    - cron: '30 15 * * *' # 9 PM IST
+
+  # MANUAL trigger from GitHub UI (for testing anytime)
   workflow_dispatch:
 
 jobs:
