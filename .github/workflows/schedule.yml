@@ -1,15 +1,16 @@
 name: Scheduled Twitter Bot
 
 on:
-  # PRODUCTION schedule - tweets 6 times a day (cron UTC -> IST in comments)
   schedule:
     - cron: '30 2 * * *'  # 8 AM IST
     - cron: '30 5 * * *'  # 11 AM IST
     - cron: '30 8 * * *'  # 2 PM IST
     - cron: '30 11 * * *' # 5 PM IST
     - cron: '30 14 * * *' # 8 PM IST
+    - cron: '30 17 * * *' # 11 PM IST    
+    - cron: '30 20 * * *' # 8 AM IST
+    - cron: '30 23 * * *' # 5 AM IST
 
-  # MANUAL trigger from GitHub UI (for testing anytime)
   workflow_dispatch:
 
 jobs:
