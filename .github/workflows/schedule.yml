@@ -6,12 +6,12 @@ on:
     - cron: '30 3 * * *'  # 9 AM IST
     - cron: '30 12 * * *' # 6 PM IST
     - cron: '30 13 * * *' # 7 PM IST
-    - cron: '30 16 * * *' # 10 PM IST    
+    - cron: '30 15 * * *' # 9 PM IST    
     - cron: '30 18 * * *' # 12 Am IST    
     - cron: '30 19 * * *' # 1 AM IST    
-    - cron: '30 21 * * *' # 3 AM IST    
+    - cron: '30 20 * * *' # 2 AM IST    
     - cron: '30 22 * * *' # 4 AM IST    
-    - cron: '30 23 * * *' # 5 AM IST    
+    - cron: '30 24 * * *' # 6 AM IST    
 
   workflow_dispatch:
 
