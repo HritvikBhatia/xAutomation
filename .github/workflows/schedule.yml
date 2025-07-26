@@ -3,12 +3,11 @@ name: Scheduled Twitter Bot
 on:
   schedule:
     - cron: '30 2 * * *'  # 8 AM IST
-    - cron: '30 3 * * *'  # 9 AM IST
+    - cron: '30 4 * * *'  # 10 AM IST
     - cron: '30 12 * * *' # 6 PM IST
-    - cron: '30 13 * * *' # 7 PM IST
-    - cron: '30 15 * * *' # 9 PM IST    
-    - cron: '30 18 * * *' # 12 Am IST    
-    - cron: '30 19 * * *' # 1 AM IST    
+    - cron: '30 14 * * *' # 8 PM IST
+    - cron: '30 16 * * *' # 10 PM IST    
+    - cron: '30 18 * * *' # 12 Am IST   
     - cron: '30 20 * * *' # 2 AM IST    
     - cron: '30 22 * * *' # 4 AM IST    
     - cron: '30 0 * * *' # 6 AM IST    
