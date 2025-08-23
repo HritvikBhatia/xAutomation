@@ -2,12 +2,10 @@ name: Scheduled Twitter Bot
 
 on:
   schedule:
-    - cron: '30 2 * * *'  # 8 AM IST
-    - cron: '30 5 * * *'  # 11 AM IST
-    - cron: '30 11 * * *' # 5 PM IST
+    - cron: '30 3 * * *'  # 9 AM IST
+    - cron: '30 13 * * *' # 6 PM IST
     - cron: '30 17 * * *' # 11 PM IST   
-    - cron: '30 20 * * *' # 2 AM IST    
-    - cron: '30 23 * * *' # 5 AM IS    
+    - cron: '30 20 * * *' # 2 AM IST
 
   workflow_dispatch:
 
