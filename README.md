@@ -1,67 +1,158 @@
-xAutomation
+# xAutomation
 
-An automation tool for posting daily on X (formerly Twitter) using the X API and cron scheduling.
-This script manages a database of scheduled posts (add/edit/delete) and posts them at the configured times.
+An automation tool for posting sequentially from a database to X (formerly Twitter), managed via CLI scripts and scheduled with GitHub Actions.
 
-Features
-- Automated posting to X via the X API
-- Scheduling of posts using cron jobs
-- Database storage of posts: content, status
-- Management scripts to add, update, delete scheduled posts
-- Reset script to clear or reinitialize the schedule database
+This script fetches posts one by one from a PostgreSQL database, posts them using the X API, and keeps track of which post to send next.
 
-Project Structure
+## Features
+
+  * **Automated Sequential Posting**: Posts tweets from a database in the order they were added.
+  * **Database State**: Remembers the last posted tweet's index to ensure no duplicates and correct ordering.
+  * **CLI Content Management**: Includes scripts to add, list, delete, and check the status of tweets in the queue.
+  * **Database Reset**: A simple script to clear all posts and reset the posting index.
+  * **Scheduled Automation**: Comes with a GitHub Actions workflow to run the bot automatically on a cron schedule.
+
+## Project Structure
+
+```
 xAutomation/
-├── index.js           - Main entry point for the bot
-├── manage.js          - Script for managing scheduled posts (add/update/delete)
-├── reset.js           - Script to reset or clear the scheduled posts database
-├── package.json
-├── package-lock.json
-├── .gitignore
-└── (config, DB models, etc.)
+├── .env.example        # Example environment variables
+├── .github/
+│   └── workflows/
+│       └── schedule.yml  # GitHub Actions workflow
+├── .gitignore          # Files to ignore
+├── index.js            # Main script to post tweets
+├── manage.js           # Script to manage posts (add, list, delete, status)
+├── package-lock.json   # Exact dependency versions
+├── package.json        # Project dependencies and info
+├── README.md           # This project documentation
+└── reset.js            # Script to clear the database
+```
 
-Setup
-1. Fork or Clone the repository
-   git clone https://github.com/HritvikBhatia/xAutomation.git
-   cd xAutomation
+## Setup
 
-2. Install dependencies
-   npm install
+1.  **Clone the repository**
 
-3. Configure environment variables
-   Create a .env file containing your X API credentials and database connection details. Example:
-   X_BEARER_TOKEN=your_x_bearer_token_here
-   DATABASE_URL=your_database_connection_string_here
+    ```sh
+    git clone https://github.com/HritvikBhatia/xAutomation.git
+    cd xAutomation
+    ```
 
-4. Initialize or reset the database (optional)
-   node reset.js
+2.  **Install dependencies**
 
-Usage
-Run the bot:
-   node index.js
+    ```sh
+    npm install
+    ```
 
-This starts the scheduler, fetches due posts from the database, posts them to X, marks them as posted, and logs the results.
+3.  **Configure environment variables**
+    Create a `.env` file in the root directory and copy the contents of `.env.example`. Fill in your credentials.
 
-Manage scheduled posts:
-Add a post:
-   node manage.js add "Hello world!"
+    ```env
+    # Your app credentials (identifies your app to Twitter)
+    TWITTER_API_KEY=...
+    TWITTER_API_SECRET=...
 
-   node manage.js add "Post 1" "Post 2"
+    # Your user access credentials (allows tweeting as your user)
+    TWITTER_ACCESS_TOKEN=...
+    TWITTER_ACCESS_SECRET=...
 
+    # Connection string for your PostgreSQL database
+    DATABASE_URL=postgresql://user:password@host:port/dbname...
+    ```
 
-Cron Scheduling
-- Default example: 0 9 * * * (every day at 09:00 UTC)
-- Every 6 hours: 0 */6 * * *
-- Weekly on Monday at 09:00: 0 9 * * MON
+4.  **Initialize the Database**
+    This project requires a PostgreSQL database with two tables. Connect to your database and run the following SQL commands to create them:
 
+    ```sql
+    -- Creates the table to store your posts
+    CREATE TABLE posts (
+      id SERIAL PRIMARY KEY,
+      content TEXT NOT NULL
+    );
 
-Logging & Monitoring
-- The bot logs attempts, successes, failures, and post ids (if returned by the API).
-- Consider adding retry logic, alerting, or integration with a logging/monitoring service.
+    -- Creates the table to track which post is next
+    CREATE TABLE tweet_state (
+      id INT PRIMARY KEY,
+      current_index INT NOT NULL DEFAULT 0
+    );
 
-Future Improvements
-- Support for image or media posts on X
-- Web UI/dashboard for scheduling and management
-- Multi-account support
-- More robust retry logic for failed API calls
-- Analytics on engagement of posted content
+    -- Initializes the state tracker
+    INSERT INTO tweet_state (id, current_index) VALUES (1, 0);
+    ```
+
+## Usage
+
+### Managing Posts (CLI)
+
+Use the `manage.js` script to add and review your scheduled posts.
+
+  * **Add one or more new posts:**
+
+      * Posts will be added to the queue. Use `\n` for line breaks.
+
+    <!-- end list -->
+
+    ```sh
+    node manage.js add "This is my first post." "This is my second post, with a\nline break."
+    ```
+
+  * **List all current posts:**
+
+    ```sh
+    node manage.js list
+    ```
+
+  * **Delete a specific post by its ID:**
+
+    ```sh
+    node manage.js delete <id>
+    ```
+
+  * **Check the current status:**
+
+      * Shows how many posts are in the database and which one is next to be posted.
+
+    <!-- end list -->
+
+    ```sh
+    node manage.js status
+    ```
+
+  * **Reset the entire queue:**
+
+      * This will delete *all* posts and reset the posting index to 0. Use with caution\!
+
+    <!-- end list -->
+
+    ```sh
+    node reset.js
+    ```
+
+### Running the Bot
+
+  * **Manually:**
+    You can trigger the bot manually at any time to post the next tweet in the queue.
+
+    ```sh
+    node index.js
+    ```
+
+    If successful, it will log the posted tweet and update the database index.
+
+  * **Scheduled (GitHub Actions):**
+    The project is configured to run automatically using GitHub Actions.
+
+      * **Schedule:** The bot is set to run at:
+          * 03:30 UTC
+          * 13:30 UTC
+          * 17:30 UTC
+          * 20:30 UTC
+      * **Setup:** For this to work in your own fork, you must add your `.env` variables ( `TWITTER_API_KEY`, `DATABASE_URL`, etc.) to your GitHub repository's **Settings \> Secrets and variables \> Actions** page.
+
+## Future Improvements
+
+  * Support for image or media posts on X
+  * Web UI/dashboard for scheduling and management
+  * Multi-account support
+  * More robust retry logic for failed API calls
+  * Analytics on engagement of posted content
